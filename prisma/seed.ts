@@ -6,6 +6,12 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting comprehensive database seed for SnapDrag...');
 
+  const existingCategories = await prisma.category.count().catch(() => 0);
+  if (existingCategories > 0 && process.env.FORCE_SEED !== 'true') {
+    console.log(`✅ Database already seeded (${existingCategories} categories found). Skipping re-seed.`);
+    return;
+  }
+
   // Clean existing tables in proper order
   await prisma.review.deleteMany();
   await prisma.favorite.deleteMany();
