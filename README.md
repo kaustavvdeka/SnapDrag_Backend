@@ -4,8 +4,8 @@
 
 SnapDrag Backend powers the offline-first marketplace connecting customers with physical traditional clothing stores across India.
 
-* **Live API Base URL**: [https://snapdrag-backend-1.onrender.com/api/v1](https://snapdrag-backend-1.onrender.com/api/v1)
-* **System & DB Health Check**: [https://snapdrag-backend-1.onrender.com/api/health](https://snapdrag-backend-1.onrender.com/api/health)
+* **Base API Path**: `/api/v1`
+* **Health Check**: `/api/health`
 
 ---
 
