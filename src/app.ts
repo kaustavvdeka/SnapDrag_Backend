@@ -68,7 +68,7 @@ export const createApp = () => {
       dbError = e.message;
     }
 
-    const dbEnv = process.env.DATABASE_URL;
+    const dbEnv = process.env.DATABASE_URL || process.env.INTERNAL_DATABASE_URL;
     res.json({
       status: 'UP',
       database: dbStatus,
