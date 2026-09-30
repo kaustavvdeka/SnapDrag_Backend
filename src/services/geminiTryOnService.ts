@@ -11,6 +11,7 @@ export interface TryOnRequest {
 
 export interface TryOnResponse {
   tryOnImageUrl: string;
+  customerImageUrl?: string;
   fitScore: number;
   stylingVerdict: string;
   drapeAdvice: string;
@@ -137,6 +138,7 @@ Generate a realistic, enthusiastic styling analysis formatted strictly as valid 
 
     return {
       tryOnImageUrl,
+      customerImageUrl: customerImg,
       fitScore,
       stylingVerdict,
       drapeAdvice,
