@@ -55,13 +55,28 @@ export const createApp = () => {
   // Static files for local image uploads
   app.use('/uploads', express.static(uploadPath));
 
-  // Health check
-  app.get('/api/health', (req, res) => {
+  // Health check with DB diagnostics
+  app.get('/api/health', async (req, res) => {
+    let dbStatus = 'UNKNOWN';
+    let dbError = null;
+    try {
+      const { prisma } = await import('./config/prisma.js');
+      await prisma.$queryRaw`SELECT 1`;
+      dbStatus = 'CONNECTED';
+    } catch (e: any) {
+      dbStatus = 'DISCONNECTED';
+      dbError = e.message;
+    }
+
+    const dbEnv = process.env.DATABASE_URL;
     res.json({
       status: 'UP',
+      database: dbStatus,
+      databaseUrlConfigured: !!dbEnv,
+      databaseTarget: dbEnv ? dbEnv.split('@')[1] || 'configured' : 'NOT_CONFIGURED (defaults to localhost:5432)',
+      dbError,
       timestamp: new Date().toISOString(),
       service: 'SnapDrag API',
-      concept: 'Discover Online -> Check Availability -> Locate Shop -> Reserve -> Visit Shop -> Inspect Physically -> Purchase',
     });
   });
 
