@@ -1,0 +1,339 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  SHOPKEEPER
+  ADMIN
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  READY_FOR_VISIT
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum NotificationType {
+  RESERVATION_UPDATE
+  STOCK_ALERT
+  SHOP_APPROVAL
+  SYSTEM
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String?
+  googleId     String?       @unique
+  name         String
+  phone        String?
+  role         Role          @default(CUSTOMER)
+  avatarUrl    String?
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  refreshTokens RefreshToken[]
+  shops         Shop[]
+  reservations  Reservation[]
+  favorites     Favorite[]
+  reviews       Review[]
+  notifications Notification[]
+  searchHistories SearchHistory[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Shop {
+  id           String        @id @default(uuid())
+  name         String
+  slug         String        @unique
+  description  String?
+  logoUrl      String?
+  bannerUrl    String?
+  phone        String
+  email        String?
+  openingHours String?       @default("10:00 AM - 9:00 PM")
+  isApproved   Boolean       @default(false)
+  isActive     Boolean       @default(true)
+  rating       Float         @default(4.5)
+  reviewCount  Int           @default(0)
+  ownerId      String
+  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  location     ShopLocation?
+  products     Product[]
+  reservations Reservation[]
+  reviews      Review[]
+  shopViews    ShopView[]
+
+  @@index([ownerId])
+  @@index([name])
+}
+
+model Mall {
+  id          String         @id @default(uuid())
+  name        String
+  slug        String         @unique
+  address     String
+  city        String
+  state       String
+  pincode     String
+  latitude    Float
+  longitude   Float
+  totalFloors Int            @default(4)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  floors      Floor[]
+  shops       ShopLocation[]
+
+  @@index([city])
+  @@index([name])
+}
+
+model Floor {
+  id          String         @id @default(uuid())
+  mallId      String
+  mall        Mall           @relation(fields: [mallId], references: [id], onDelete: Cascade)
+  floorNumber String         // e.g. "G", "1", "2", "3"
+  floorName   String         // e.g. "Ground Floor - Ethnic Couture"
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  shopLocations ShopLocation[]
+
+  @@unique([mallId, floorNumber])
+}
+
+model ShopLocation {
+  id              String   @id @default(uuid())
+  shopId          String   @unique
+  shop            Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  address         String
+  city            String
+  state           String
+  pincode         String
+  country         String   @default("India")
+  latitude        Float
+  longitude       Float
+
+  mallId          String?
+  mall            Mall?    @relation(fields: [mallId], references: [id], onDelete: SetNull)
+  floorId         String?
+  floor           Floor?   @relation(fields: [floorId], references: [id], onDelete: SetNull)
+
+  floorName       String?  // fallback / explicit floor display e.g. "2nd Floor"
+  shopNumber      String?  // e.g. "Shop 204"
+  section         String?  // e.g. "Ethnic & Bridal Wing"
+  nearbyLandmark  String?  // e.g. "Opposite Central Escalator, near Food Court"
+  indoorDirections String? // e.g. "Take central elevator to 2nd floor, turn left past Pantaloons"
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([city])
+  @@index([latitude, longitude])
+}
+
+model Category {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  slug        String     @unique
+  description String?
+  imageUrl    String?
+  displayOrder Int       @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  products    Product[]
+}
+
+model Product {
+  id                String         @id @default(uuid())
+  sku               String         @unique
+  name              String
+  slug              String
+  description       String
+  price             Float
+  discountPercent   Float          @default(0)
+  discountedPrice   Float
+  shopId            String
+  shop              Shop           @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  categoryId        String
+  category          Category       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  
+  material          String         // e.g. "Muga Silk", "Katan Silk", "Pure Georgette"
+  color             String         // e.g. "Crimson Red", "Royal Blue", "Golden Mustard"
+  size              String         @default("Free Size") // e.g. "Free Size", "S", "M", "L", "XL", "Unstitched"
+  
+  // Real inventory tracking
+  totalQuantity     Int            @default(5)
+  availableQuantity Int            @default(5)
+  reservedQuantity  Int            @default(0)
+  soldQuantity      Int            @default(0)
+
+  isFeatured        Boolean        @default(false)
+  isActive          Boolean        @default(true)
+  tags              String[]       @default([])
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  images            ProductImage[]
+  reservations      Reservation[]
+  favorites         Favorite[]
+  reviews           Review[]
+  productViews      ProductView[]
+
+  @@index([name])
+  @@index([price])
+  @@index([categoryId])
+  @@index([shopId])
+  @@index([availableQuantity])
+  @@index([color])
+  @@index([material])
+}
+
+model ProductImage {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  altText   String?
+  isPrimary Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model Reservation {
+  id                 String            @id @default(uuid())
+  reservationCode    String            @unique // e.g. "TRAD-8F42K"
+  customerId         String
+  customer           User              @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  shopId             String
+  shop               Shop              @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  productId          String
+  product            Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity           Int               @default(1)
+  unitPrice          Float
+  status             ReservationStatus @default(PENDING)
+  preferredVisitDate DateTime
+  preferredVisitTime String?           // e.g. "4:00 PM - 6:00 PM"
+  notes              String?
+  cancelReason       String?
+  expiresAt          DateTime
+  completedAt        DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@index([customerId])
+  @@index([shopId])
+  @@index([productId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model Favorite {
+  id         String   @id @default(uuid())
+  customerId String
+  customer   User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([customerId, productId])
+  @@index([customerId])
+  @@index([productId])
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  customerId String
+  customer   User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  shopId     String
+  shop       Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  productId  String?
+  product    Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  rating     Int      // 1 to 5
+  comment    String
+  createdAt  DateTime @default(now())
+
+  @@index([shopId])
+  @@index([customerId])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      NotificationType @default(SYSTEM)
+  isRead    Boolean          @default(false)
+  link      String?
+  createdAt DateTime         @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model SearchHistory {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  query     String
+  location  String?
+  filters   Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model ProductView {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model ShopView {
+  id        String   @id @default(uuid())
+  shopId    String
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([shopId])
+}

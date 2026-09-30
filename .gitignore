@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Environment Variables
+.env
+.env.*
+!*.env.example
+
+# Build Outputs
+dist/
+*.tsbuildinfo
+
+# Uploaded Files
+uploads/
+uploads/*
+!uploads/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS & IDE
+.DS_Store
+.idea/
+.vscode/
