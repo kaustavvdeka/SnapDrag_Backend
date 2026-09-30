@@ -13,10 +13,14 @@ const uploadPath = path.resolve(process.cwd(), IMAGE_UPLOAD_DIR);
 export const createApp = () => {
   const app = express();
 
-  // Parse CORS allowed origins
-  const origins = CORS_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean);
-  if (!origins.includes(CLIENT_URL)) origins.push(CLIENT_URL);
+  // Parse CORS allowed origins and strip trailing slashes for robust browser matching
+  const origins = CORS_ORIGIN.split(',')
+    .map((o) => o.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+  const normalizedClientUrl = CLIENT_URL ? CLIENT_URL.replace(/\/+$/, '') : '';
+  if (normalizedClientUrl && !origins.includes(normalizedClientUrl)) origins.push(normalizedClientUrl);
   if (!origins.includes('http://localhost:5173')) origins.push('http://localhost:5173');
+  if (!origins.includes('https://snap-drag.vercel.app')) origins.push('https://snap-drag.vercel.app');
 
   // Security Headers
   app.use(
