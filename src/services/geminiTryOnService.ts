@@ -102,7 +102,7 @@ Generate a realistic, enthusiastic styling analysis formatted strictly as valid 
         }
       );
 
-      const json = await response.json();
+      const json: any = await response.json();
       const rawText = json.candidates?.[0]?.content?.parts?.[0]?.text;
       if (rawText) {
         geminiAnalysis = JSON.parse(rawText);

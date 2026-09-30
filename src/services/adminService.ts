@@ -103,6 +103,13 @@ export class AdminService {
     });
   }
 
+  async toggleUserStatus(userId: string, isActive: boolean) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: { isActive },
+    });
+  }
+
   async getAllShops() {
     return prisma.shop.findMany({
       include: {

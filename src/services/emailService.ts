@@ -9,7 +9,7 @@ export interface EmailOptions {
 }
 
 class EmailService {
-  private transporter: nodemailer.Transporter | null = null;
+  private transporter: any = null;
   private isConfigured: boolean = false;
 
   constructor() {
