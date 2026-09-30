@@ -42,4 +42,38 @@ router.get('/categories', async (req, res, next) => {
   }
 });
 
+// Setup and seed database endpoint
+router.post('/setup-db', async (req, res) => {
+  try {
+    const key = req.headers['x-setup-key'] || req.query.key;
+    if (key !== 'snapdrag-seed-2026') {
+      return res.status(403).json({ success: false, message: 'Unauthorized key' });
+    }
+
+    const { execSync } = await import('child_process');
+    console.log('🚀 Running npx prisma db push --accept-data-loss...');
+    const pushOut = execSync('npx prisma db push --accept-data-loss', { encoding: 'utf-8' });
+
+    console.log('🌱 Running npx tsx prisma/seed.ts...');
+    const seedOut = execSync('npx tsx prisma/seed.ts', {
+      encoding: 'utf-8',
+      env: { ...process.env, FORCE_SEED: 'true' },
+    });
+
+    return res.json({
+      success: true,
+      message: 'Database schema pushed and all 21 boutiques seeded successfully!',
+      pushSummary: pushOut.trim(),
+      seedSummary: seedOut.trim().slice(-300),
+    });
+  } catch (err: any) {
+    console.error('Setup endpoint failed:', err);
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+      stderr: err.stderr,
+    });
+  }
+});
+
 export default router;
