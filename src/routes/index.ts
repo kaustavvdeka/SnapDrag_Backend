@@ -9,6 +9,7 @@ import locationRoutes from './locationRoutes.js';
 import adminRoutes from './adminRoutes.js';
 import uploadRoutes from './uploadRoutes.js';
 import aiRoutes from './aiRoutes.js';
+import mirrorRoutes from './mirrorRoutes.js';
 import prisma from '../config/prisma.js';
 import { sendSuccess } from '../utils/apiResponse.js';
 
@@ -24,6 +25,7 @@ router.use('/locations', locationRoutes);
 router.use('/admin', adminRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/ai', aiRoutes);
+router.use('/mirror', mirrorRoutes);
 
 // Category discovery endpoint
 router.get('/categories', async (req, res, next) => {

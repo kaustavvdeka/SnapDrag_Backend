@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@google/genai": "^2.24.0",
+    "@gradio/client": "^2.7.1",
     "@prisma/client": "^6.4.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",

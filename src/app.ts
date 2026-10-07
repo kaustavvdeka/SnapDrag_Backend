@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import apiRoutes from './routes/index.js';
+import mirrorRoutes from './routes/mirrorRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { CLIENT_URL, IMAGE_UPLOAD_DIR, CORS_ORIGIN, RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX } from './config/constants.js';
 
@@ -82,6 +83,7 @@ export const createApp = () => {
 
   // REST API v1 routes
   app.use('/api/v1', apiRoutes);
+  app.use('/api/mirror', mirrorRoutes);
 
   // Centralized Error Handling
   app.use(errorHandler);

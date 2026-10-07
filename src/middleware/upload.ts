@@ -33,8 +33,15 @@ export const uploadSingle = multer({
   fileFilter,
 }).single('image');
 
+export const uploadUserImage = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+  fileFilter,
+}).single('userImage');
+
 export const uploadMultiple = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB per file
   fileFilter,
 }).array('images', 8);
+
