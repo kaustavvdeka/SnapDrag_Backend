@@ -137,7 +137,7 @@ export class MirrorService {
     garmentPhotoType: 'flat-lay' | 'model'
   ): Promise<string> {
     const hfToken = process.env.HF_TOKEN;
-    const clientOptions = hfToken ? { hf_token: hfToken } : {};
+    const clientOptions = hfToken ? { token: hfToken, hf_token: hfToken } : {};
 
     const client = await Client.connect('fashn-ai/fashn-vton-1.5', clientOptions);
 
