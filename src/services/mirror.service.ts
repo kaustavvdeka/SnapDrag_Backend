@@ -7,6 +7,7 @@ import { Client, handle_file } from '@gradio/client';
 import prisma from '../config/prisma.js';
 import { IMAGE_UPLOAD_DIR } from '../config/constants.js';
 import { storageService } from '../storage/storageService.js';
+import { backgroundRemovalService } from './backgroundRemoval.service.js';
 
 export interface TryOnParams {
   productId: string;
@@ -280,20 +281,21 @@ export class MirrorService {
     const category = mapProductCategory(product.category?.name, product.category?.slug, product.name);
     const garmentPhotoType = determineGarmentPhotoType(product.tags, product.description);
 
-    // 4. Prepare garment image input (Cloudinary URL or local file path)
+    // 4. Preprocess garment with automatic background removal for crisp flat-lay
     let tempGarmentPath = '';
     let garmentInput = garmentImageUrl;
 
-    if (garmentImageUrl.startsWith('http://') || garmentImageUrl.startsWith('https://')) {
+    try {
+      console.log('✂️ Preprocessing garment with automatic background removal (rembg)...');
+      const cleanGarment = await backgroundRemovalService.removeBackground(garmentImageUrl, {
+        uploadToCloudinary: true,
+      });
+      garmentInput = cleanGarment.cloudinaryUrl || cleanGarment.localPath;
+      tempGarmentPath = cleanGarment.localPath;
+      console.log('✅ Clean garment cutout ready for Virtual Try-On:', garmentInput);
+    } catch (bgErr) {
+      console.warn('Background removal pre-processing failed, using original garment image:', bgErr);
       garmentInput = garmentImageUrl;
-    } else {
-      const tempDir = path.resolve(process.cwd(), IMAGE_UPLOAD_DIR);
-      if (garmentImageUrl.startsWith('/uploads/')) {
-        tempGarmentPath = path.resolve(process.cwd(), garmentImageUrl.replace(/^\//, ''));
-      } else {
-        tempGarmentPath = path.resolve(process.cwd(), IMAGE_UPLOAD_DIR, path.basename(garmentImageUrl));
-      }
-      garmentInput = tempGarmentPath;
     }
 
     // 5. Try prediction using JS @gradio/client first, fallback to Python gradio_client
