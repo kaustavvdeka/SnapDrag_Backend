@@ -5,9 +5,9 @@ import https from 'https';
 import http from 'http';
 import { Client, handle_file } from '@gradio/client';
 import prisma from '../config/prisma.js';
-import { IMAGE_UPLOAD_DIR } from '../config/constants.js';
 import { storageService } from '../storage/storageService.js';
 import { backgroundRemovalService } from './backgroundRemoval.service.js';
+import { FASHN_CONFIG, FashnCategory, FashnGarmentPhotoType } from '../config/fashn.config.js';
 
 export interface TryOnParams {
   productId: string;
@@ -17,46 +17,93 @@ export interface TryOnParams {
 export interface TryOnResult {
   imageUrl: string;
   userImageUrl?: string;
+  productId: string;
+  garmentImageUrl: string;
+  category: FashnCategory;
 }
 
 /**
- * Helper to download a remote image URL to a local temporary file
+ * Validate user portrait image quality and parameters
  */
-const downloadImageToTemp = (url: string, destPath: string): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(destPath);
-    const client = url.startsWith('https') ? https : http;
+export const validateUserImageQuality = (file: Express.Multer.File): void => {
+  if (!file || !file.path) {
+    throw new Error('Please upload a clear photo of yourself.');
+  }
 
-    client
-      .get(url, (response) => {
-        if (response.statusCode && response.statusCode >= 400) {
-          return reject(
-            new Error(
-              `Failed to download garment image from ${url}, status: ${response.statusCode}`
-            )
-          );
+  // Reject tiny or stub images
+  if (file.size < 5 * 1024) {
+    throw new Error('The uploaded photo is too small or corrupted. Please upload a clear, full-body or upper-body photo with good lighting.');
+  }
+
+  // Reject oversized images (10MB)
+  if (file.size > 10 * 1024 * 1024) {
+    throw new Error('Image size exceeds 10MB limit. Please upload a photo under 10MB.');
+  }
+
+  const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+  if (!allowedMimes.includes(file.mimetype)) {
+    throw new Error('Unsupported image format. Please upload a JPEG, PNG, or WebP photo.');
+  }
+};
+
+/**
+ * Check if a remote image URL is accessible and returns valid image content
+ */
+export const verifyRemoteImageUrl = async (url: string, timeoutMs = 4000): Promise<boolean> => {
+  if (!url || typeof url !== 'string' || !url.startsWith('http')) return false;
+
+  return new Promise((resolve) => {
+    try {
+      const parsedUrl = new URL(url);
+      const client = parsedUrl.protocol === 'https:' ? https : http;
+
+      const req = client.request(
+        parsedUrl,
+        {
+          method: 'HEAD',
+          timeout: timeoutMs,
+          headers: { 'User-Agent': 'SnapDrag-Mirror/1.0' },
+        },
+        (res) => {
+          const status = res.statusCode || 0;
+          const contentType = res.headers['content-type'] || '';
+          if (status >= 200 && status < 400 && (contentType.startsWith('image/') || contentType === 'application/octet-stream')) {
+            resolve(true);
+          } else if (status >= 200 && status < 400) {
+            // Some CDNs don't return content-type on HEAD, treat 200 as ok
+            resolve(true);
+          } else {
+            resolve(false);
+          }
         }
-        response.pipe(file);
-        file.on('finish', () => {
-          file.close(() => resolve(destPath));
-        });
-      })
-      .on('error', (err) => {
-        fs.unlink(destPath, () => {});
-        reject(err);
+      );
+
+      req.on('timeout', () => {
+        req.destroy();
+        resolve(false);
       });
+
+      req.on('error', () => {
+        resolve(false);
+      });
+
+      req.end();
+    } catch {
+      resolve(false);
+    }
   });
 };
 
 /**
- * Determine FASHN category from product & category metadata
+ * Determine FASHN category from SnapDrag product & category metadata
  */
 export const mapProductCategory = (
   categoryName?: string,
   categorySlug?: string,
-  productName?: string
-): 'tops' | 'bottoms' | 'one-pieces' => {
-  const combined = `${categoryName || ''} ${categorySlug || ''} ${productName || ''}`.toLowerCase();
+  productName?: string,
+  tags: string[] = []
+): FashnCategory => {
+  const combined = `${categoryName || ''} ${categorySlug || ''} ${productName || ''} ${tags.join(' ')}`.toLowerCase();
 
   const topsKeywords = [
     'shirt',
@@ -69,7 +116,13 @@ export const mapProductCategory = (
     'sweater',
     'vest',
     'upper',
+    'choli',
+    'bodice',
+    'shrug',
+    'blazer',
+    'crop top',
   ];
+
   const bottomsKeywords = [
     'pants',
     'trousers',
@@ -81,21 +134,35 @@ export const mapProductCategory = (
     'pyjama',
     'palazzo',
     'lower',
+    'churidar',
+    'salwar pants',
+    'leggings',
+    'culottes',
   ];
+
   const onePieceKeywords = [
-    'dress',
-    'saree',
-    'sari',
+    'mekhela chador',
     'mekhela',
     'chador',
+    'saree',
+    'sari',
+    'dress',
     'gown',
-    'one-piece',
-    'onepiece',
-    'anarkali',
     'lehenga',
+    'ghagra',
+    'anarkali',
+    'salwar suit',
     'suit',
     'sherwani',
+    'poshak',
+    'nauvari',
+    'paithani',
+    'sharara',
     'kaftan',
+    'one-piece',
+    'onepiece',
+    'bridal wear',
+    'wedding',
   ];
 
   for (const kw of topsKeywords) {
@@ -108,7 +175,7 @@ export const mapProductCategory = (
     if (combined.includes(kw)) return 'one-pieces';
   }
 
-  // Default for traditional clothing
+  // Graceful fallback: SnapDrag specializes in traditional Indian drapes (Sarees, Mekhela Chadors, Lehengas)
   return 'one-pieces';
 };
 
@@ -117,10 +184,18 @@ export const mapProductCategory = (
  */
 export const determineGarmentPhotoType = (
   tags: string[] = [],
-  description = ''
-): 'flat-lay' | 'model' => {
-  const text = `${tags.join(' ')} ${description}`.toLowerCase();
-  if (text.includes('model') || text.includes('worn') || text.includes('on model')) {
+  description = '',
+  imageAlt = ''
+): FashnGarmentPhotoType => {
+  const text = `${tags.join(' ')} ${description} ${imageAlt}`.toLowerCase();
+  if (
+    text.includes('model') ||
+    text.includes('worn') ||
+    text.includes('on model') ||
+    text.includes('mannequin') ||
+    text.includes('editorial') ||
+    text.includes('worn by')
+  ) {
     return 'model';
   }
   return 'flat-lay';
@@ -133,26 +208,28 @@ export class MirrorService {
   async predictWithJsGradio(
     userImageInput: string,
     garmentImageInput: string,
-    category: 'tops' | 'bottoms' | 'one-pieces',
-    garmentPhotoType: 'flat-lay' | 'model'
+    category: FashnCategory,
+    garmentPhotoType: FashnGarmentPhotoType
   ): Promise<string> {
     const hfToken = process.env.HF_TOKEN;
     const clientOptions = hfToken ? { token: hfToken, hf_token: hfToken } : {};
 
-    const client = await Client.connect('fashn-ai/fashn-vton-1.5', clientOptions);
+    console.log(`[Mirror] Connecting to ${FASHN_CONFIG.space}...`);
+    const client = await Client.connect(FASHN_CONFIG.space, clientOptions);
 
     const personHandle = handle_file(userImageInput);
     const garmentHandle = handle_file(garmentImageInput);
 
-    const predictResult: any = await client.predict('/try_on', {
+    console.log(`[Mirror] Triggering inference on ${FASHN_CONFIG.endpoint} (cat=${category}, type=${garmentPhotoType})...`);
+    const predictResult: any = await client.predict(FASHN_CONFIG.endpoint, {
       person_image: personHandle,
       garment_image: garmentHandle,
       category,
       garment_photo_type: garmentPhotoType,
-      num_timesteps: 50,
-      guidance_scale: 1.5,
-      seed: 42,
-      segmentation_free: true,
+      num_timesteps: FASHN_CONFIG.num_timesteps,
+      guidance_scale: FASHN_CONFIG.guidance_scale,
+      seed: FASHN_CONFIG.seed,
+      segmentation_free: FASHN_CONFIG.segmentation_free,
     });
 
     if (predictResult && predictResult.data) {
@@ -168,17 +245,17 @@ export class MirrorService {
       }
     }
 
-    throw new Error('JS Gradio client did not return a valid image URL.');
+    throw new Error('Gradio client completed but did not return a valid result image.');
   }
 
   /**
-   * Run Hugging Face FASHN VTON 1.5 prediction using Python gradio_client script
+   * Run Hugging Face FASHN VTON 1.5 prediction using Python gradio_client script as fallback
    */
   async predictWithPythonGradio(
     userImageInput: string,
     garmentImageInput: string,
-    category: 'tops' | 'bottoms' | 'one-pieces',
-    garmentPhotoType: 'flat-lay' | 'model'
+    category: FashnCategory,
+    garmentPhotoType: FashnGarmentPhotoType
   ): Promise<string> {
     let scriptPath = path.resolve(process.cwd(), 'src/scripts/fashn_tryon.py');
     if (!fs.existsSync(scriptPath)) {
@@ -194,9 +271,9 @@ export class MirrorService {
         '--garment-image', garmentImageInput,
         '--category', category,
         '--garment-photo-type', garmentPhotoType,
-        '--num-timesteps', '50',
-        '--guidance-scale', '1.5',
-        '--seed', '42',
+        '--num-timesteps', FASHN_CONFIG.num_timesteps.toString(),
+        '--guidance-scale', FASHN_CONFIG.guidance_scale.toString(),
+        '--seed', FASHN_CONFIG.seed.toString(),
       ];
 
       const env = {
@@ -204,9 +281,9 @@ export class MirrorService {
         HF_TOKEN: process.env.HF_TOKEN || '',
       };
 
-      execFile(pythonExe, args, { env, timeout: 120000 }, (error, stdout, stderr) => {
+      execFile(pythonExe, args, { env, timeout: FASHN_CONFIG.timeoutMs }, (error, stdout, stderr) => {
         if (error) {
-          console.error('Python Gradio script error:', error, stderr);
+          console.error('[Mirror] Python Gradio script error:', error, stderr);
           return reject(error);
         }
 
@@ -236,20 +313,16 @@ export class MirrorService {
     });
   }
 
+  /**
+   * Process virtual try-on with automated garment extraction and user portrait optimization
+   */
   async processTryOn({ productId, userImageFile }: TryOnParams): Promise<TryOnResult> {
-    if (!userImageFile || !userImageFile.path) {
-      throw new Error('User image is missing. Please upload a clear photo of yourself.');
-    }
+    // 1. Validate user portrait image quality
+    validateUserImageQuality(userImageFile);
 
     if (!productId) {
       throw new Error('Product ID is required.');
     }
-
-    // 1. Upload user image to Cloudinary (removes local file from system disk)
-    console.log('☁️ Uploading user photo for Mirror Try-On to Cloudinary...');
-    const userImageResult = await storageService.uploadImage(userImageFile);
-    const userImageUrl = userImageResult.url;
-    console.log('✅ User photo uploaded to Cloudinary:', userImageUrl);
 
     // 2. Fetch product from database
     const product = await prisma.product.findUnique({
@@ -257,31 +330,62 @@ export class MirrorService {
       include: {
         category: true,
         images: {
-          orderBy: { isPrimary: 'desc' },
+          orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }],
         },
       },
     });
 
     if (!product) {
-      throw new Error('Product not found.');
+      throw new Error('Product not found in SnapDrag catalog.');
     }
 
     if (!product.images || product.images.length === 0) {
-      throw new Error('Sorry, this product cannot be used with Mirror because it has no image.');
+      throw new Error('This product currently cannot be used with Mirror because it has no garment image.');
     }
 
-    const primaryImage = product.images.find((img) => img.isPrimary) || product.images[0];
-    let garmentImageUrl = primaryImage.url;
+    // 3. Select best verified garment image
+    // Prefer primary image, verify remote accessibility, and fallback to next images if primary is broken
+    let selectedImage = product.images[0];
+    let isVerified = false;
 
+    for (const img of product.images) {
+      if (img.url && (await verifyRemoteImageUrl(img.url))) {
+        selectedImage = img;
+        isVerified = true;
+        break;
+      }
+    }
+
+    if (!isVerified) {
+      console.warn(`[Mirror] Warning: remote verification failed for all images of product ${productId}, falling back to primary URL`);
+      selectedImage = product.images.find((img) => img.isPrimary) || product.images[0];
+    }
+
+    const garmentImageUrl = selectedImage.url;
     if (!garmentImageUrl) {
-      throw new Error('Sorry, this product has no valid image URL.');
+      throw new Error('This product has no valid garment image URL.');
     }
 
-    // 3. Map category & photo type
-    const category = mapProductCategory(product.category?.name, product.category?.slug, product.name);
-    const garmentPhotoType = determineGarmentPhotoType(product.tags, product.description);
+    // 4. Map category & photo type
+    const category = mapProductCategory(
+      product.category?.name,
+      product.category?.slug,
+      product.name,
+      product.tags
+    );
+    const garmentPhotoType = determineGarmentPhotoType(
+      product.tags,
+      product.description,
+      selectedImage.altText || ''
+    );
 
-    // 4. Preprocess garment with automatic background removal for crisp flat-lay
+    // 5. Upload user portrait to Cloudinary
+    console.log('☁️ Uploading user photo for Mirror Try-On to Cloudinary...');
+    const userImageResult = await storageService.uploadImage(userImageFile);
+    const userImageUrl = userImageResult.url;
+    console.log('✅ User photo uploaded to Cloudinary:', userImageUrl);
+
+    // 6. Preprocess garment with automatic background removal for crisp flat-lay
     let tempGarmentPath = '';
     let garmentInput = garmentImageUrl;
 
@@ -294,36 +398,36 @@ export class MirrorService {
       tempGarmentPath = cleanGarment.localPath;
       console.log('✅ Clean garment cutout ready for Virtual Try-On:', garmentInput);
     } catch (bgErr) {
-      console.warn('Background removal pre-processing failed, using original garment image:', bgErr);
+      console.warn('[Mirror] Background removal pre-processing failed, using original garment image:', bgErr);
       garmentInput = garmentImageUrl;
     }
 
-    // 5. Try prediction using JS @gradio/client first, fallback to Python gradio_client
+    // 7. Try prediction using JS @gradio/client first, fallback to Python gradio_client
     let resultImageUrl = '';
     try {
-      console.log('Running FASHN VTON 1.5 prediction via JS @gradio/client...');
+      console.log(`[Mirror] Running FASHN VTON 1.5 prediction via JS @gradio/client for "${product.name}"...`);
       resultImageUrl = await this.predictWithJsGradio(userImageUrl, garmentInput, category, garmentPhotoType);
     } catch (jsErr: any) {
-      console.warn('JS @gradio/client prediction failed:', jsErr.message || jsErr);
+      console.warn('[Mirror] JS @gradio/client prediction failed:', jsErr.message || jsErr);
       const errMsg = String(jsErr.message || jsErr || '');
 
       if (errMsg.includes('ZeroGPU') || errMsg.includes('quota') || errMsg.includes('exceeded')) {
-        throw new Error('Hugging Face ZeroGPU quota limit reached for public space fashn-ai/fashn-vton-1.5. Please add a free HF_TOKEN in server/.env or try again in a few moments.');
+        throw new Error('Hugging Face ZeroGPU quota limit reached for public space fashn-ai/fashn-vton-1.5. Please try again in a few moments.');
       }
 
       try {
         resultImageUrl = await this.predictWithPythonGradio(userImageUrl, garmentInput, category, garmentPhotoType);
       } catch (pyErr: any) {
-        console.error('Both JS and Python Gradio clients failed:', pyErr);
+        console.error('[Mirror] Both JS and Python Gradio clients failed:', pyErr);
         const pyErrMsg = String(pyErr.message || pyErr || '');
         if (pyErrMsg.includes('ZeroGPU') || pyErrMsg.includes('quota') || pyErrMsg.includes('exceeded')) {
-          throw new Error('Hugging Face ZeroGPU quota limit reached for public space fashn-ai/fashn-vton-1.5. Please add a free HF_TOKEN in server/.env or try again in a few moments.');
+          throw new Error('Hugging Face ZeroGPU quota limit reached for public space fashn-ai/fashn-vton-1.5. Please try again in a few moments.');
         }
-        throw new Error('Mirror is currently busy or unavailable right now. Please try again in a few moments.');
+        throw new Error('Mirror is temporarily unavailable. Please try again in a few moments.');
       }
     } finally {
       // Clean up temporary local files if created
-      if (fs.existsSync(userImageFile.path)) {
+      if (userImageFile.path && fs.existsSync(userImageFile.path)) {
         try { fs.unlinkSync(userImageFile.path); } catch {}
       }
       if (tempGarmentPath && fs.existsSync(tempGarmentPath)) {
@@ -334,6 +438,9 @@ export class MirrorService {
     return {
       imageUrl: resultImageUrl,
       userImageUrl,
+      productId: product.id,
+      garmentImageUrl,
+      category,
     };
   }
 }
