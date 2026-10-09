@@ -26,7 +26,7 @@ export class AssistantService {
 
     if (!message || !message.trim()) {
       return {
-        reply: 'Hello! I am your SnapDrag Traditional Fashion Assistant. How can I help you discover handlooms, boutiques, or virtual try-ons today?',
+        reply: 'Hello! I am your Vastrix Traditional Fashion Assistant. How can I help you discover handlooms, boutiques, or virtual try-ons today?',
         products: [],
         shops: [],
         intent: 'general_help',
@@ -51,7 +51,7 @@ export class AssistantService {
     let shops: AssistantShopSummary[] = [];
     let availability: AvailabilityResult | undefined;
 
-    // 2. Dispatch to dedicated SnapDrag database tools
+    // 2. Dispatch to dedicated Vastrix database tools
     if (intent === 'search_shops') {
       shops = await searchShops({
         query: filters.query,

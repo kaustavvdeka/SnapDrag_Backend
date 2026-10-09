@@ -166,7 +166,7 @@ CRITICAL REQUIREMENTS:
                 try {
                   if (CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET) {
                     const cldRes = await cloudinary.uploader.upload(base64DataUrl, {
-                      folder: 'snapdrag/try-on',
+                      folder: 'vastrix/try-on',
                       public_id: `tryon_${product.id}_${Date.now()}`,
                     });
                     tryOnImageUrl = cldRes.secure_url;
@@ -191,7 +191,7 @@ CRITICAL REQUIREMENTS:
     }
 
     // 4. Stylist Critique with Gemini 2.5 Flash
-    const systemPrompt = `You are the master traditional Indian couture stylist & virtual fitting consultant for SnapDrag Traditional Clothing Marketplace.
+    const systemPrompt = `You are the master traditional Indian couture stylist & virtual fitting consultant for Vastrix Traditional Clothing Marketplace.
 Analyze the customer's uploaded portrait and the selected traditional ensemble:
 - Product: "${product.name}"
 - Category: "${product.category.name}"

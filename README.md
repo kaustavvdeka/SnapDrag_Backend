@@ -1,8 +1,8 @@
-# SnapDrag — Backend API Server
+# Vastrix — Backend API Server
 
 > **Production REST API for Physical Boutique Digitization & Traditional Clothing Marketplace**
 
-SnapDrag Backend powers the offline-first marketplace connecting customers with physical traditional clothing stores across India.
+Vastrix Backend powers the offline-first marketplace connecting customers with physical traditional clothing stores across India.
 
 * **Base API Path**: `/api/v1`
 * **Health Check**: `/api/health`
@@ -202,5 +202,5 @@ npm run test:e2e
 | Role | Email | Password | Details |
 |---|---|---|---|
 | **Customer** | `ananya.sharma@example.com` | `Customer@123456` | Can browse, try in mirror, and hold items |
-| **Shopkeeper** | `kamakhya.handloom@snapdrag.local` | `Password@123456` | Owner of Maa Kamakhya Traditional Handlooms (Guwahati) |
-| **Administrator** | `admin@snapdrag.local` | `Admin@123456` | Full platform governance & metrics access |
+| **Shopkeeper** | `kamakhya.handloom@vastrix.local` | `Password@123456` | Owner of Maa Kamakhya Traditional Handlooms (Guwahati) |
+| **Administrator** | `admin@vastrix.local` | `Admin@123456` | Full platform governance & metrics access |

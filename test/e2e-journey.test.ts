@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const API_URL = 'http://localhost:5001/api/v1';
 
 async function runE2EJourney() {
-  console.log('🚀 Starting Comprehensive SnapDrag End-to-End User Journey Test...\n');
+  console.log('🚀 Starting Comprehensive Vastrix End-to-End User Journey Test...\n');
 
   // Step 1: Register a new customer
   console.log('--- Step 1: Customer Registration ---');
@@ -158,7 +158,7 @@ async function runE2EJourney() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      email: 'admin@snapdrag.local',
+      email: 'admin@vastrix.local',
       password: 'Admin@123456',
     }),
   });

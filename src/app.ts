@@ -77,7 +77,7 @@ export const createApp = () => {
       databaseTarget: dbEnv ? dbEnv.split('@')[1] || 'configured' : 'NOT_CONFIGURED (defaults to localhost:5432)',
       dbError,
       timestamp: new Date().toISOString(),
-      service: 'SnapDrag API',
+      service: 'Vastrix API',
     });
   });
 

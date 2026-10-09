@@ -44,7 +44,7 @@ export class MirrorController {
       let statusCode = 500;
 
       if (rawMsg.includes('Product not found')) {
-        friendlyMessage = 'Product not found in SnapDrag catalog.';
+        friendlyMessage = 'Product not found in Vastrix catalog.';
         statusCode = 404;
       } else if (
         rawMsg.includes('cannot be used with Mirror') ||

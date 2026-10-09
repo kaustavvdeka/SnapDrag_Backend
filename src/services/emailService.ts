@@ -35,7 +35,7 @@ class EmailService {
 
     try {
       await this.transporter.sendMail({
-        from: `SnapDrag Traditional Clothing <${EMAIL_FROM || SMTP_USER}>`,
+        from: `Vastrix Traditional Clothing <${EMAIL_FROM || SMTP_USER}>`,
         to: options.to,
         subject: options.subject,
         text: options.text,
@@ -52,7 +52,7 @@ class EmailService {
     const subject = `In-Store Hold Confirmed: ${reservationCode} - ${productName}`;
     const html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 3px solid #121212; padding: 24px; background-color: #FAF7EE;">
-        <h1 style="text-transform: uppercase; font-size: 24px; color: #121212; margin-top: 0;">SnapDrag Hold Confirmed</h1>
+        <h1 style="text-transform: uppercase; font-size: 24px; color: #121212; margin-top: 0;">Vastrix Hold Confirmed</h1>
         <p style="font-size: 16px; color: #121212;">Your in-store hold for <strong>${productName}</strong> has been secured for 48 hours.</p>
         
         <div style="background-color: #FFE600; border: 2px solid #121212; padding: 16px; margin: 20px 0; text-align: center;">

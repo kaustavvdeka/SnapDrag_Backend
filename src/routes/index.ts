@@ -50,7 +50,7 @@ router.get('/categories', async (req, res, next) => {
 router.post('/setup-db', async (req, res) => {
   try {
     const key = req.headers['x-setup-key'] || req.query.key;
-    if (key !== 'snapdrag-seed-2026') {
+    if (key !== 'vastrix-seed-2026' && key !== 'snapdrag-seed-2026') {
       return res.status(403).json({ success: false, message: 'Unauthorized key' });
     }
 

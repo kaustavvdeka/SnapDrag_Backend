@@ -79,7 +79,7 @@ export class CloudinaryStorageProvider implements IStorageProvider {
 
     try {
       const uploadResult = await cloudinary.uploader.upload(file.path, {
-        folder: 'snapdrag/products',
+        folder: 'vastrix/products',
         public_id: path.parse(file.filename).name,
       });
 
@@ -120,7 +120,7 @@ export class S3StorageProvider implements IStorageProvider {
   async saveFile(file: Express.Multer.File): Promise<UploadedFileResult> {
     // AWS S3 client integration hook
     return {
-      url: `https://snapdrag-clothing.s3.amazonaws.com/${file.filename}`,
+      url: `https://vastrix-clothing.s3.amazonaws.com/${file.filename}`,
       key: file.filename,
       provider: 's3',
     };

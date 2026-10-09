@@ -74,7 +74,7 @@ export class AdminService {
         userId: shop.ownerId,
         title: approve ? 'Shop Approved! 🎉' : 'Shop Approval Request Declined',
         message: approve
-          ? `Congratulations! Your shop "${shop.name}" is now live on SnapDrag.`
+          ? `Congratulations! Your shop "${shop.name}" is now live on Vastrix.`
           : `Your shop registration for "${shop.name}" was not approved. Please verify your details.`,
         type: NotificationType.SHOP_APPROVAL,
         link: '/dashboard',

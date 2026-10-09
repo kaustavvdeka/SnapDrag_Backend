@@ -74,7 +74,7 @@ export async function checkAvailability(params: AvailabilityParams): Promise<Ava
   if (!product) {
     return {
       found: false,
-      policyNotice: 'This product was not found in SnapDrag inventory.',
+      policyNotice: 'This product was not found in Vastrix inventory.',
     };
   }
 

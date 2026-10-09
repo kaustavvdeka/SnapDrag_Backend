@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting comprehensive database seed for SnapDrag...');
+  console.log('🌱 Starting comprehensive database seed for Vastrix...');
 
   const existingCategories = await prisma.category.count().catch(() => 0);
   if (existingCategories > 0 && process.env.FORCE_SEED !== 'true') {
@@ -39,7 +39,7 @@ async function main() {
   // 1. Create Admin
   const admin = await prisma.user.create({
     data: {
-      email: 'admin@snapdrag.local',
+      email: 'admin@vastrix.local',
       passwordHash: adminPasswordHash,
       name: 'System Admin',
       phone: '+91 9876543210',
@@ -349,7 +349,7 @@ async function main() {
   // 5. Create 10 Shopkeepers and 10 Shops
   const shopsSeedData = [
     {
-      ownerEmail: 'kamakhya.handloom@snapdrag.local',
+      ownerEmail: 'kamakhya.handloom@vastrix.local',
       ownerName: 'Pranab Bordoloi',
       shopName: 'Maa Kamakhya Traditional Handlooms',
       slug: 'maa-kamakhya-traditional-handlooms',
@@ -357,7 +357,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1200&q=80',
       phone: '+91 9435123456',
-      email: 'kamakhya@snapdrag.local',
+      email: 'kamakhya@vastrix.local',
       openingHours: '10:00 AM - 9:30 PM (All 7 Days)',
       rating: 4.9,
       reviewCount: 142,
@@ -378,7 +378,7 @@ async function main() {
       },
     },
     {
-      ownerEmail: 'barak.muga@snapdrag.local',
+      ownerEmail: 'barak.muga@vastrix.local',
       ownerName: 'Debolina Bhattacharjee',
       shopName: 'Barak Valley Muga & Paat Haven',
       slug: 'barak-valley-muga-paat-haven',
@@ -386,7 +386,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=1200&q=80',
       phone: '+91 9435098765',
-      email: 'barakweaves@snapdrag.local',
+      email: 'barakweaves@vastrix.local',
       openingHours: '10:30 AM - 8:30 PM (Sun Closed)',
       rating: 4.8,
       reviewCount: 98,
@@ -407,7 +407,7 @@ async function main() {
       },
     },
     {
-      ownerEmail: 'kashi.weavers@snapdrag.local',
+      ownerEmail: 'kashi.weavers@vastrix.local',
       ownerName: 'Rameshwar Lal Banarasi',
       shopName: 'Kashi Weavers & Silk Emporium',
       slug: 'kashi-weavers-silk-emporium',
@@ -415,7 +415,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=1200&q=80',
       phone: '+91 9839012345',
-      email: 'kashi.varanasi@snapdrag.local',
+      email: 'kashi.varanasi@vastrix.local',
       openingHours: '10:00 AM - 9:00 PM',
       rating: 4.9,
       reviewCount: 220,
@@ -434,7 +434,7 @@ async function main() {
       },
     },
     {
-      ownerEmail: 'pinkcity.poshak@snapdrag.local',
+      ownerEmail: 'pinkcity.poshak@vastrix.local',
       ownerName: 'Sunita Rathore',
       shopName: 'Rajputana Royal Poshak & Bandhej',
       slug: 'rajputana-royal-poshak-bandhej',
@@ -442,7 +442,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=1200&q=80',
       phone: '+91 9414012345',
-      email: 'rajputana.jaipur@snapdrag.local',
+      email: 'rajputana.jaipur@vastrix.local',
       openingHours: '11:00 AM - 8:30 PM',
       rating: 4.7,
       reviewCount: 115,
@@ -463,7 +463,7 @@ async function main() {
       },
     },
     {
-      ownerEmail: 'dakshin.silks@snapdrag.local',
+      ownerEmail: 'dakshin.silks@vastrix.local',
       ownerName: 'Meenakshi Sundaram',
       shopName: 'Dakshin Kanchi Pure Silks',
       slug: 'dakshin-kanchi-pure-silks',
@@ -471,7 +471,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1609357605129-26f69add5d6e?w=1200&q=80',
       phone: '+91 9840012345',
-      email: 'kanchi.dakshin@snapdrag.local',
+      email: 'kanchi.dakshin@vastrix.local',
       openingHours: '9:30 AM - 9:00 PM',
       rating: 4.9,
       reviewCount: 310,
@@ -490,7 +490,7 @@ async function main() {
       },
     },
     {
-      ownerEmail: 'bengal.baluchari@snapdrag.local',
+      ownerEmail: 'bengal.baluchari@vastrix.local',
       ownerName: 'Anandita Roy Mukherjee',
       shopName: 'Bishnupur Baluchari & Swarnachari Kendra',
       slug: 'bishnupur-baluchari-swarnachari-kendra',
@@ -498,7 +498,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=1200&q=80',
       phone: '+91 9830098765',
-      email: 'baluchari.kolkata@snapdrag.local',
+      email: 'baluchari.kolkata@vastrix.local',
       openingHours: '10:30 AM - 9:00 PM',
       rating: 4.8,
       reviewCount: 165,
@@ -519,7 +519,7 @@ async function main() {
       },
     },
     {
-      ownerEmail: 'chandni.bridal@snapdrag.local',
+      ownerEmail: 'chandni.bridal@vastrix.local',
       ownerName: 'Davinder Singh Kapoor',
       shopName: 'Kapoor Heritage Bridal & Chikankari',
       slug: 'kapoor-heritage-bridal-chikankari',
@@ -527,7 +527,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&q=80',
       phone: '+91 9811099887',
-      email: 'chandni.kapoor@snapdrag.local',
+      email: 'chandni.kapoor@vastrix.local',
       openingHours: '11:00 AM - 9:00 PM',
       rating: 4.7,
       reviewCount: 190,
@@ -548,7 +548,7 @@ async function main() {
       },
     },
     {
-      ownerEmail: 'pragjyotish.silks@snapdrag.local',
+      ownerEmail: 'pragjyotish.silks@vastrix.local',
       ownerName: 'Manash Hazarika',
       shopName: 'Pragjyotish Heritage Silks & Handlooms',
       slug: 'pragjyotish-heritage-silks',
@@ -556,7 +556,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1200&q=80',
       phone: '+91 9864012345',
-      email: 'pragjyotish@snapdrag.local',
+      email: 'pragjyotish@vastrix.local',
       openingHours: '10:00 AM - 8:30 PM',
       rating: 4.8,
       reviewCount: 88,
@@ -575,7 +575,7 @@ async function main() {
       },
     },
     {
-      ownerEmail: 'surat.resham@snapdrag.local',
+      ownerEmail: 'surat.resham@vastrix.local',
       ownerName: 'Chetan Mehta',
       shopName: 'Surat Resham & Patola Mahal',
       slug: 'surat-resham-patola-mahal',
@@ -583,7 +583,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=1200&q=80',
       phone: '+91 9825012345',
-      email: 'patola.surat@snapdrag.local',
+      email: 'patola.surat@vastrix.local',
       openingHours: '10:00 AM - 9:00 PM',
       rating: 4.7,
       reviewCount: 79,
@@ -602,7 +602,7 @@ async function main() {
       },
     },
     {
-      ownerEmail: 'cachar.ethnic@snapdrag.local',
+      ownerEmail: 'cachar.ethnic@vastrix.local',
       ownerName: 'Bikramaditya Paul',
       shopName: 'Cachar Ethnic Wardrobe & Silks',
       slug: 'cachar-ethnic-wardrobe-silks',
@@ -610,7 +610,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=1200&q=80',
       phone: '+91 9435088776',
-      email: 'cachar.ethnic@snapdrag.local',
+      email: 'cachar.ethnic@vastrix.local',
       openingHours: '10:00 AM - 8:00 PM',
       rating: 4.6,
       reviewCount: 64,
@@ -631,7 +631,7 @@ async function main() {
     // --- Additional Requested Cities & Shops ---
     // 11. Mumbai: Kala Niketan Paithani & Nauvari
     {
-      ownerEmail: 'kala.niketan@snapdrag.local',
+      ownerEmail: 'kala.niketan@vastrix.local',
       ownerName: 'Manjiri Deshmukh',
       shopName: 'Kala Niketan Paithani & Nauvari Couture',
       slug: 'kala-niketan-paithani-nauvari-couture',
@@ -639,7 +639,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1200&q=80',
       phone: '+91 9820112233',
-      email: 'kalaniketan.mumbai@snapdrag.local',
+      email: 'kalaniketan.mumbai@vastrix.local',
       openingHours: '10:30 AM - 9:30 PM',
       rating: 4.9,
       reviewCount: 165,
@@ -661,7 +661,7 @@ async function main() {
     },
     // 12. Mumbai: Zaveri Heritage Silk Emporium
     {
-      ownerEmail: 'zaveri.heritage@snapdrag.local',
+      ownerEmail: 'zaveri.heritage@vastrix.local',
       ownerName: 'Harshil Shah',
       shopName: 'Zaveri Heritage Silk Emporium',
       slug: 'zaveri-heritage-silk-emporium',
@@ -669,7 +669,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=1200&q=80',
       phone: '+91 9821223344',
-      email: 'zaveri.heritage@snapdrag.local',
+      email: 'zaveri.heritage@vastrix.local',
       openingHours: '10:00 AM - 8:30 PM',
       rating: 4.8,
       reviewCount: 110,
@@ -689,7 +689,7 @@ async function main() {
     },
     // 13. Bengaluru: Angadi Silks Heritage Lounge
     {
-      ownerEmail: 'angadi.silks@snapdrag.local',
+      ownerEmail: 'angadi.silks@vastrix.local',
       ownerName: 'Radhika K. Radhakrishnan',
       shopName: 'Angadi Silks Heritage Lounge',
       slug: 'angadi-silks-heritage-lounge',
@@ -697,7 +697,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=1200&q=80',
       phone: '+91 9845012345',
-      email: 'angadi.bengaluru@snapdrag.local',
+      email: 'angadi.bengaluru@vastrix.local',
       openingHours: '10:00 AM - 9:00 PM',
       rating: 5.0,
       reviewCount: 312,
@@ -719,7 +719,7 @@ async function main() {
     },
     // 14. Bengaluru: Samyakk Bridal & Kanjivaram Haven
     {
-      ownerEmail: 'samyakk.bridal@snapdrag.local',
+      ownerEmail: 'samyakk.bridal@vastrix.local',
       ownerName: 'Venkatesh Murthy',
       shopName: 'Samyakk Bridal & Kanjivaram Haven',
       slug: 'samyakk-bridal-kanjivaram-haven',
@@ -727,7 +727,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1609357605129-26f69add5d6e?w=1200&q=80',
       phone: '+91 9886012345',
-      email: 'samyakk.blr@snapdrag.local',
+      email: 'samyakk.blr@vastrix.local',
       openingHours: '10:30 AM - 8:30 PM',
       rating: 4.9,
       reviewCount: 204,
@@ -747,7 +747,7 @@ async function main() {
     },
     // 15. Bengaluru: Mysore Saree Udyog Emporium
     {
-      ownerEmail: 'mysore.saree@snapdrag.local',
+      ownerEmail: 'mysore.saree@vastrix.local',
       ownerName: 'Naveen Kumar',
       shopName: 'Mysore Saree Udyog Emporium',
       slug: 'mysore-saree-udyog-emporium',
@@ -755,7 +755,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=1200&q=80',
       phone: '+91 9844098765',
-      email: 'mysore.saree@snapdrag.local',
+      email: 'mysore.saree@vastrix.local',
       openingHours: '10:00 AM - 8:30 PM',
       rating: 4.8,
       reviewCount: 180,
@@ -775,7 +775,7 @@ async function main() {
     },
     // 16. Delhi: Frontier Raas Heritage Couture
     {
-      ownerEmail: 'frontier.raas@snapdrag.local',
+      ownerEmail: 'frontier.raas@vastrix.local',
       ownerName: 'Anil Batra',
       shopName: 'Frontier Raas Heritage Couture',
       slug: 'frontier-raas-heritage-couture',
@@ -783,7 +783,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1200&q=80',
       phone: '+91 9811012345',
-      email: 'frontierraas.delhi@snapdrag.local',
+      email: 'frontierraas.delhi@vastrix.local',
       openingHours: '11:00 AM - 9:00 PM',
       rating: 4.9,
       reviewCount: 240,
@@ -805,7 +805,7 @@ async function main() {
     },
     // 17. Delhi: Meena Bazaar South Extension
     {
-      ownerEmail: 'meenabazaar.delhi@snapdrag.local',
+      ownerEmail: 'meenabazaar.delhi@vastrix.local',
       ownerName: 'Ritu Kapoor',
       shopName: 'Meena Bazaar Traditional Silks',
       slug: 'meena-bazaar-traditional-silks',
@@ -813,7 +813,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=1200&q=80',
       phone: '+91 9810098765',
-      email: 'meenabazaar.southex@snapdrag.local',
+      email: 'meenabazaar.southex@vastrix.local',
       openingHours: '10:30 AM - 8:30 PM',
       rating: 4.7,
       reviewCount: 195,
@@ -833,7 +833,7 @@ async function main() {
     },
     // 18. Kolkata: Adi Mohini Mohan Kanjilal Heritage
     {
-      ownerEmail: 'ammk.kolkata@snapdrag.local',
+      ownerEmail: 'ammk.kolkata@vastrix.local',
       ownerName: 'Swapan Kanjilal',
       shopName: 'Adi Mohini Mohan Kanjilal Heritage',
       slug: 'adi-mohini-mohan-kanjilal-heritage',
@@ -841,7 +841,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=1200&q=80',
       phone: '+91 9830012345',
-      email: 'ammk.collegest@snapdrag.local',
+      email: 'ammk.collegest@vastrix.local',
       openingHours: '10:00 AM - 8:30 PM',
       rating: 4.9,
       reviewCount: 380,
@@ -861,7 +861,7 @@ async function main() {
     },
     // 19. Kolkata: Swarnachari & Baluchari Bhaban
     {
-      ownerEmail: 'swarnachari.kolkata@snapdrag.local',
+      ownerEmail: 'swarnachari.kolkata@vastrix.local',
       ownerName: 'Pratima Sen',
       shopName: 'Swarnachari & Baluchari Bhaban',
       slug: 'swarnachari-baluchari-bhaban',
@@ -869,7 +869,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1200&q=80',
       phone: '+91 9831098765',
-      email: 'swarnachari.saltlake@snapdrag.local',
+      email: 'swarnachari.saltlake@vastrix.local',
       openingHours: '10:30 AM - 9:00 PM',
       rating: 4.8,
       reviewCount: 145,
@@ -891,7 +891,7 @@ async function main() {
     },
     // 20. Guwahati: Silkalay Assam Silk House
     {
-      ownerEmail: 'silkalay.assam@snapdrag.local',
+      ownerEmail: 'silkalay.assam@vastrix.local',
       ownerName: 'Bhaskar Saikia',
       shopName: 'Silkalay Assam Silk House',
       slug: 'silkalay-assam-silk-house',
@@ -899,7 +899,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=1200&q=80',
       phone: '+91 9435198765',
-      email: 'silkalay.guwahati@snapdrag.local',
+      email: 'silkalay.guwahati@vastrix.local',
       openingHours: '9:30 AM - 8:30 PM',
       rating: 4.9,
       reviewCount: 210,
@@ -921,7 +921,7 @@ async function main() {
     },
     // 21. Silchar: Surma Valley Tant & Benarasi Bhaban
     {
-      ownerEmail: 'surma.valley@snapdrag.local',
+      ownerEmail: 'surma.valley@vastrix.local',
       ownerName: 'Partha Sarathi Roy',
       shopName: 'Surma Valley Tant & Benarasi Bhaban',
       slug: 'surma-valley-tant-benarasi-bhaban',
@@ -929,7 +929,7 @@ async function main() {
       logoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&q=80',
       bannerUrl: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=1200&q=80',
       phone: '+91 9435212345',
-      email: 'surma.silchar@snapdrag.local',
+      email: 'surma.silchar@vastrix.local',
       openingHours: '10:00 AM - 8:30 PM',
       rating: 4.8,
       reviewCount: 130,
@@ -1640,15 +1640,15 @@ async function main() {
       shopId: createdShops[0].id,
       productId: createdProducts[0].id,
       rating: 5,
-      comment: 'Found the exact Muga Silk Mekhela Chador here on SnapDrag. The shop had it ready in 15 mins for physical inspection. Outstanding quality!',
+      comment: 'Found the exact Muga Silk Mekhela Chador here on Vastrix. The shop had it ready in 15 mins for physical inspection. Outstanding quality!',
     },
   });
 
   console.log('🌟 Seed data generation completed successfully!');
   console.log('----------------------------------------------------');
   console.log('Login credentials:');
-  console.log('Admin:       admin@snapdrag.local / Admin@123456');
-  console.log('Shopkeeper:  kamakhya.handloom@snapdrag.local / Password@123456');
+  console.log('Admin:       admin@vastrix.local / Admin@123456');
+  console.log('Shopkeeper:  kamakhya.handloom@vastrix.local / Password@123456');
   console.log('Customer:    ananya.sharma@example.com / Customer@123456');
   console.log('----------------------------------------------------');
 }

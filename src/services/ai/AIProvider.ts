@@ -328,12 +328,12 @@ export class AIProvider {
     availability?: AvailabilityResult;
     history: ChatMessage[];
   }): Promise<string> {
-    const systemPrompt = `You are SnapDrag's AI Shopping Assistant for authentic Indian handlooms, traditional weaves, and local boutiques.
+    const systemPrompt = `You are Vastrix's AI Shopping Assistant for authentic Indian handlooms, traditional weaves, and local boutiques.
 CRITICAL ANTI-HALLUCINATION RULES:
 1. You must ONLY state product names, prices, shops, stock quantities, and physical addresses that are explicitly listed in the DATA RESULTS below.
-2. If the DATA RESULTS are empty, explicitly tell the user: "I couldn't find a matching product in SnapDrag's inventory right now." and suggest broader filters (e.g. higher budget, another city, or related categories).
+2. If the DATA RESULTS are empty, explicitly tell the user: "I couldn't find a matching product in Vastrix's inventory right now." and suggest broader filters (e.g. higher budget, another city, or related categories).
 3. DO NOT invent fake products, discounts, prices, or store locations under any circumstance.
-4. SnapDrag is an OFFLINE physical purchase model: customers can place a 100% free 48-hour hold to visit the boutique physically and inspect garments in person. Never ask for online payments or checkout.
+4. Vastrix is an OFFLINE physical purchase model: customers can place a 100% free 48-hour hold to visit the boutique physically and inspect garments in person. Never ask for online payments or checkout.
 5. Highlight that customers can click "✨ Try with Mirror" on any product card to see themselves virtually draped in the garment before visiting.
 6. Keep answers concise, welcoming, stylish, and polite (under 3 paragraphs). Format with clean Markdown.`;
 
@@ -378,7 +378,7 @@ CRITICAL ANTI-HALLUCINATION RULES:
         : null,
     };
 
-    const promptText = `${systemPrompt}\n\n### DATA RESULTS FROM SNAPDRAG BACKEND:\n${JSON.stringify(
+    const promptText = `${systemPrompt}\n\n### DATA RESULTS FROM VASTRIX BACKEND:\n${JSON.stringify(
       dataPayload,
       null,
       2
@@ -423,7 +423,7 @@ CRITICAL ANTI-HALLUCINATION RULES:
     // 1. Availability Inquiry
     if (intent === 'check_availability' && availability) {
       if (!availability.found || !availability.product) {
-        return `I searched SnapDrag inventory, but couldn't locate this specific item. Please check the spelling or browse our catalog in the Explore tab.`;
+        return `I searched Vastrix inventory, but couldn't locate this specific item. Please check the spelling or browse our catalog in the Explore tab.`;
       }
       const prod = availability.product;
       const count = prod.availableQuantity;
@@ -440,12 +440,12 @@ CRITICAL ANTI-HALLUCINATION RULES:
 
     // 2. Reservation Inquiry
     if (intent === 'reservation_inquiry') {
-      return `On SnapDrag, you can place a **100% free 48-hour hold** on any in-stock outfit. You'll receive a unique in-store reservation code, allowing you to physically visit the boutique, try it on, and inspect the weave in person before deciding to purchase! Zero upfront payment.`;
+      return `On Vastrix, you can place a **100% free 48-hour hold** on any in-stock outfit. You'll receive a unique in-store reservation code, allowing you to physically visit the boutique, try it on, and inspect the weave in person before deciding to purchase! Zero upfront payment.`;
     }
 
     // 3. Mirror Help
     if (intent === 'mirror_help') {
-      return `SnapDrag's **🪞 Mirror** is an AI Virtual Try-On engine powered by FASHN VTON 1.5. Simply select any outfit, click **✨ Try with Mirror**, and upload a photo of yourself. Mirror will contour and drape the garment directly onto your portrait!`;
+      return `Vastrix's **🪞 Mirror** is an AI Virtual Try-On engine powered by FASHN VTON 1.5. Simply select any outfit, click **✨ Try with Mirror**, and upload a photo of yourself. Mirror will contour and drape the garment directly onto your portrait!`;
     }
 
     // 4. Shop Search
@@ -453,7 +453,7 @@ CRITICAL ANTI-HALLUCINATION RULES:
       if (shops.length === 0) {
         return `I couldn't find any approved boutiques matching "${
           filters.city || filters.query || 'your search'
-        }" in SnapDrag right now. We currently feature artisan weavers across Guwahati, Silchar, Kolkata, Varanasi, Delhi, Jaipur, Mumbai, and Bengaluru!`;
+        }" in Vastrix right now. We currently feature artisan weavers across Guwahati, Silchar, Kolkata, Varanasi, Delhi, Jaipur, Mumbai, and Bengaluru!`;
       }
 
       const shopList = shops
@@ -463,7 +463,7 @@ CRITICAL ANTI-HALLUCINATION RULES:
         )
         .join('\n');
 
-      return `Here are top traditional clothing boutiques available on SnapDrag:\n\n${shopList}\n\nClick on any shop to explore their in-store collection or get indoor floor directions!`;
+      return `Here are top traditional clothing boutiques available on Vastrix:\n\n${shopList}\n\nClick on any shop to explore their in-store collection or get indoor floor directions!`;
     }
 
     // 5. Product Search & Recommendations
@@ -475,7 +475,7 @@ CRITICAL ANTI-HALLUCINATION RULES:
       if (filters.color) filterDesc.push(`in ${filters.color}`);
       if (filters.material) filterDesc.push(`crafted with ${filters.material}`);
 
-      return `I couldn't find a matching product in SnapDrag's catalog ${
+      return `I couldn't find a matching product in Vastrix's catalog ${
         filterDesc.length > 0 ? `for ${filterDesc.join(', ')}` : ''
       }.\n\nYou could try expanding your price budget, choosing another city, or exploring related regional weaves like Assam Silk or Banarasi!`;
     }

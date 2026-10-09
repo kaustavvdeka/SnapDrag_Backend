@@ -62,7 +62,7 @@ export const verifyRemoteImageUrl = async (url: string, timeoutMs = 4000): Promi
         {
           method: 'HEAD',
           timeout: timeoutMs,
-          headers: { 'User-Agent': 'SnapDrag-Mirror/1.0' },
+          headers: { 'User-Agent': 'Vastrix-Mirror/1.0' },
         },
         (res) => {
           const status = res.statusCode || 0;
@@ -95,7 +95,7 @@ export const verifyRemoteImageUrl = async (url: string, timeoutMs = 4000): Promi
 };
 
 /**
- * Determine FASHN category from SnapDrag product & category metadata
+ * Determine FASHN category from Vastrix product & category metadata
  */
 export const mapProductCategory = (
   categoryName?: string,
@@ -175,7 +175,7 @@ export const mapProductCategory = (
     if (combined.includes(kw)) return 'one-pieces';
   }
 
-  // Graceful fallback: SnapDrag specializes in traditional Indian drapes (Sarees, Mekhela Chadors, Lehengas)
+  // Graceful fallback: Vastrix specializes in traditional Indian drapes (Sarees, Mekhela Chadors, Lehengas)
   return 'one-pieces';
 };
 
@@ -336,7 +336,7 @@ export class MirrorService {
     });
 
     if (!product) {
-      throw new Error('Product not found in SnapDrag catalog.');
+      throw new Error('Product not found in Vastrix catalog.');
     }
 
     if (!product.images || product.images.length === 0) {

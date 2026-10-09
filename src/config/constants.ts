@@ -6,8 +6,8 @@ export const NODE_ENV = process.env.NODE_ENV || 'development';
 export const CLIENT_URL = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // JWT Configuration (Supports both JWT_ACCESS_SECRET and JWT_SECRET)
-export const JWT_SECRET = process.env.JWT_ACCESS_SECRET || process.env.JWT_SECRET || 'snapdrag_fallback_jwt_access_secret_2026';
-export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'snapdrag_fallback_jwt_refresh_secret_2026';
+export const JWT_SECRET = process.env.JWT_ACCESS_SECRET || process.env.JWT_SECRET || 'vastrix_fallback_jwt_access_secret_2026';
+export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'vastrix_fallback_jwt_refresh_secret_2026';
 export const JWT_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN || process.env.JWT_EXPIRES_IN || '7d';
 export const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
 
