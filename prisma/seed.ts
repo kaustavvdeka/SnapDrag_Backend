@@ -1532,6 +1532,50 @@ async function main() {
     productCount++;
   }
 
+  // 6b. Canary Yellow & Emerald Green Zari Silk Lehenga Chador Set with Cloudinary Studio Cutout
+  const featuredLehengaCategory = categoryMap.get('mekhela-chador') || Array.from(categoryMap.values())[0];
+  const featuredLehengaShop = createdShops[0]; // Maa Kamakhya Traditional Handlooms
+
+  const customLehenga = await prisma.product.create({
+    data: {
+      sku: 'LHG-YELLOW-BRAZIL-2026',
+      name: 'Canary Yellow & Emerald Green Zari Silk Lehenga Chador Set',
+      slug: 'yellow-emerald-green-zari-silk-lehenga-chador-set',
+      description: 'Stunning studio cutout of a handcrafted Canary Yellow & Emerald Green silk lehenga chador set featuring royal blue intricate woven zari borders and matching stitched blouse. Perfect for festive celebrations and AI Virtual Try-On.',
+      price: 5999,
+      discountPercent: 18,
+      discountedPrice: 4899,
+      shopId: featuredLehengaShop.id,
+      categoryId: featuredLehengaCategory,
+      material: 'Pure Silk with Woven Zari Border',
+      color: 'Canary Yellow & Emerald Green',
+      size: 'Free Size (Stitched)',
+      totalQuantity: 8,
+      availableQuantity: 7,
+      reservedQuantity: 0,
+      soldQuantity: 1,
+      isFeatured: true,
+      tags: ['flat-lay', 'lehenga', 'chador', 'yellow', 'green', 'ethnic', 'silk', 'studio-cutout'],
+      images: {
+        create: [
+          {
+            url: 'https://res.cloudinary.com/dppvd6ctv/image/upload/v1791569464/vastrix/products/canary_yellow_lehenga_chador_cutout.png',
+            altText: 'Canary Yellow & Emerald Green Zari Silk Lehenga Chador Set Studio Cutout',
+            isPrimary: true,
+            order: 0,
+          },
+          {
+            url: 'https://res.cloudinary.com/dppvd6ctv/image/upload/v1791364382/snapdrag/products/image4.jpg',
+            altText: 'Canary Yellow & Emerald Green Zari Silk Lehenga Chador Set Studio Flat Lay',
+            isPrimary: false,
+            order: 1,
+          },
+        ],
+      },
+    },
+  });
+  createdProducts.push(customLehenga);
+
   console.log(`👗 Created ${createdProducts.length} Realistic Traditional Clothing Products with stock & image relations.`);
 
   // 7. Create Sample In-Store Reservations
